@@ -2,13 +2,25 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Province;
-use App\Address;
-use Illuminate\Support\Facades\DB;
 use App\Http\Requests;
+use App\Http\Requests\MarkCreateRequest;
+use App\Http\Requests\MarkUpdateRequest;
+use App\Product;
+use App\Mark;
+use App\Address;
+use App\Category;
+use App\Price_Per;
+use App\Province;
+use App\District;
+use App\Service;
+use DB;
+use Auth;
+use Hash;
+use Validator;
+use Response;
+use Session;
 
-class ProvinceController extends Controller
+class AddressController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -17,10 +29,7 @@ class ProvinceController extends Controller
      */
     public function index()
     {
-        $provinces=DB::table('provinces')->get();
-             return response()->json(
-            $provinces
-            );
+        //
     }
 
     /**
@@ -52,7 +61,8 @@ class ProvinceController extends Controller
      */
     public function show($id)
     {
-        
+        $address = Address::findOrFail($id);
+        return response()->json($address);
     }
 
     /**
@@ -63,9 +73,8 @@ class ProvinceController extends Controller
      */
     public function edit($id)
     {
-        $address = Address::FindOrFail($id);
-        $provinces = Province::FindOrFail($address->province_id);
-        return response()->json($provinces);
+        $address = Address::findOrFail($id);
+        return response()->json($address);
     }
 
     /**

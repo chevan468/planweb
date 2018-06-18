@@ -13,12 +13,6 @@ class AddServiceIDToAddressTable extends Migration
     public function up()
     {
         Schema::table('addresses', function (Blueprint $table) {
-           $table->integer('service_id')->unsigned();
-
-
-          //--------------------
-          //$table->primary('id');
-          $table->foreign('service_id')->references('id')->on('services');
           
           $table->integer('province_id')->unsigned();
 

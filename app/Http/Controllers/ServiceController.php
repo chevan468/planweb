@@ -5,8 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 
 use App\Http\Requests;
-use App\Http\Requests\MarkCreateRequest;
-use App\Http\Requests\MarkUpdateRequest;
+use App\Http\Requests\ServiceCreateRequest;
+use App\Http\Requests\ServiceUpdateRequest;
 use App\Product;
 use App\Mark;
 use App\Address;
@@ -46,9 +46,29 @@ class ServiceController extends Controller
 
     public function listall()
     {
-        $service = Service::
-         select('id','name','description','price')->where('user_id',(Auth::id()))->get();;
+         $service = DB::table('services')
+              ->select('services.id', 'services.name', 'services.description', 'services.price','services.category_id'
+              ,'provinces.name as province_id', 'services.fulladdress')
+              ->join('provinces', 'services.province_id', '=', 'provinces.id')
+              ->where('services.user_id',(Auth::id()))->get();
+        // $service = Service::
+        //  select('id','name','description','price')->where('user_id',(Auth::id()))->get();
         return View('/service/listall')->with('services',$service);
+
+    }
+    
+    public function listhome()
+    {
+         $service = DB::table('services')
+             ->select('services.id', 'services.name', 'services.description','services.price','users.name as auth',
+             'users.lastName as lastName', 'categories.name as category', 'price_pers.name as pricePer', 'provinces.name as province')
+             ->join('users', 'services.user_id', '=', 'users.id')
+             ->join('categories', 'services.category_id', '=', 'categories.id')
+             ->join('price_pers', 'services.pricePer_id', '=', 'price_pers.id')
+             ->join('provinces', 'services.province_id', '=', 'provinces.id')
+             ->get();
+
+        return View('/listservice')->with('services',$service);
 
     }
 
@@ -64,7 +84,7 @@ class ServiceController extends Controller
     }
 
 
-    public function store( Request $request)
+    public function store(ServiceCreateRequest $request)
     {
         
         if ($request->ajax())
@@ -81,15 +101,10 @@ class ServiceController extends Controller
             'legalNumber'=> 0,
             'contactNumber'=> ($request['contactNumber']),
             'contactEmail'=> ($request['contactEmail']),
-         	  ]);
-         $address = DB::table('addresses')
-         ->insert([
-            'user_id'=> (Auth::id()),
-            'service_id'=> ($service),
             'province_id'=> ($request['province']),
-            'district_id'=> ($request['district']),
-            'fullAddress'=> ($request['fullAddress']),
-             ]);
+                'district_id'=> ($request['district']),
+                'fullAddress'=> ($request['fullAddress'])
+         	  ]);
 
             return response()->json(['success'=>'true']);
         }else{
@@ -116,23 +131,35 @@ class ServiceController extends Controller
     }
 
 
-    public function update(MarkUpdateRequest $request, $id)
+    public function update(ServiceUpdateRequest $request, $id)
     {
        
         if ($request->ajax())
         {
-            $mark = mark::FindOrFail($id);
-            $input = $request->all();
-            $result = $mark->fill($input)->save();
+            $service = Service::findOrFail($id);
+            $service->name =($request['name']);
+            $service->category_id = ($request['category']);
+            $service->description = ($request['description']);
+            $service->price = ($request['price']);
+            $service->pricePer_id = ($request['pricePer']);
+            $service->legalNumber= 0;
+            $service->contactNumber = ($request['contactNumber']);
+            $service->contactEmail = ($request['contactEmail']);
             
-            if ($result){
-                return response()->json(['success'=>'true']);
-            } 
-            else
+            
+            $service->province_id = ($request['province']);
+            $service->district_id = ($request['district']);
+            $service->fullAddress = ($request['fullAddress']);
+            
+            $service->save();
+            
+            return response()->json(['success'=>'true']);
+            
+            
+        } else
             {
               return response()->json(['success'=>'false']);  
-            }
-        }   
+            }  
  
         
     }
@@ -140,16 +167,8 @@ class ServiceController extends Controller
 
     public function destroy($id)
     {
-
-        $address = Address::FindOrFail($id);
-        $address=DB::table('addresses')->where('service_id',$id)->get();
-        $result = $address->delete();
-        
         $service = Service::FindOrFail($id);
-        $id_service = $service->id;
         $result = $service->delete();
-        
-        
 
         if ($result)
         {
@@ -162,5 +181,24 @@ class ServiceController extends Controller
 
 
 
+    }
+    
+    public function openUserService($id){
+        
+    $service =  DB::table('services')
+             ->select('services.id', 'services.name', 'services.description','services.price','services.fullAddress',
+             'services.contactEmail','services.contactNumber','users.name as auth',
+             'users.lastName as lastName', 'categories.name as category', 'price_pers.name as pricePer', 'provinces.name as province'
+             ,'districts.name as district')
+             ->where('services.id','=',$id)
+             ->join('users', 'services.user_id', '=', 'users.id')
+             ->join('categories', 'services.category_id', '=', 'categories.id')
+             ->join('price_pers', 'services.pricePer_id', '=', 'price_pers.id')
+             ->join('provinces', 'services.province_id', '=', 'provinces.id')
+             ->join('districts', 'services.district_id', '=', 'districts.id')
+             ->first();
+              
+    return view('service.userservice')->with('service',$service);
+        
     }
 }

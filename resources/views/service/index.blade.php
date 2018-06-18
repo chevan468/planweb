@@ -5,7 +5,7 @@
 @section('content')
 <br>
 
-   <div class="row">
+   <div class="container">
      <div class="col-md-8 col-md-offset-2">
 
        @include('partials.messages')
@@ -33,12 +33,12 @@
 
 <script  type="text/javascript">
 
-
+    //carga la lista de servicios al cargar la vista index
     $(document).ready(function(){
         listservice();
     });
 
-
+    // paginación, actualmente no se encuentra funcionando
     $(document).on("click",".pagination li a",function(e) {
         e.preventDefault();
 
@@ -54,6 +54,7 @@
 
     });
     
+    //carga la lista de servicicos en el div list-service encontrada en el index, se renderiza la vista listall sobre ese div
 var listservice = function()
     {
       blockPage();
@@ -66,7 +67,7 @@ var listservice = function()
           }
       });
   }
-    
+    // carga los select, se debe explicar la ruta de donde los va a obtener y al select que se quieran cargar.
     function loadSelect(route,select) {
     var route = route;
       $(select).empty();
@@ -79,18 +80,41 @@ var listservice = function()
       });
     }
     
+    // carga los select, pero se define un valor pre seleccionado, se utiliza para casos de actualizar.
+    function loadSelectDefault(route,select, preselect) {
+    var route = route;
+      $(select).empty();
+      $.get(route, function(res) {
+        if (res.length!=0) {
+           $(res).each(function(key, value) {
+               if(value.id == preselect){
+                   $(select).append($('<option>', {value:value.id, text:value.name}).attr("selected","selected"));
+               }else{
+                   $(select).append($('<option>', {value:value.id, text:value.name}));
+               }
+               
+          });
+        }
+      });
+    }
+    
     
 //-------- CREAR UN SERVICIO --------//
 
 $("#nuevo").click(function(event)
   {
       blockPage();
+      $.get(this.href, function(response) {
+        $('.divForAddService').html(response);
+      });
+      clearAddForm();
       loadSelect("../categories", "#createServiceform #category" );
       loadSelect("../pricePer", "#createServiceform #pricePer" );
       loadSelect("../provinces", "#createServiceform #province" );
       loadSelect("../districts", "#createServiceform #district" );
-      $("#serviceCreateModal").modal('show');
       $.unblockUI();
+      $("#serviceCreateModal").modal('show');
+      
       
   }
   );
@@ -99,14 +123,14 @@ $("#nuevo").click(function(event)
     {       blockPage();
             var name = $("#createServiceform #name").val();
             var category = $("#createServiceform #category").val();
-            var description = $("#description").val();
-            var price = $("#price").val();
+            var description = $("#createServiceform #description").val();
+            var price = $("#createServiceform #price").val();
             var pricePer = $("#createServiceform #pricePer").val();
             var province = $("#createServiceform #province").val();
             var district = $("#createServiceform #district").val();
-            var fullAddress = $("#fullAddress").val();
-            var contactNumber = $("#contactNumber").val();
-            var contactEmail = $("#contactEmail").val();
+            var fullAddress = $("#createServiceform #fullAddress").val();
+            var contactNumber = $("#createServiceform #contactNumber").val();
+            var contactEmail = $("#createServiceform #contactEmail").val();
             var token = $("input[name=_token]").val();
             var route = "{{route('services.store')}}";
       
@@ -131,14 +155,16 @@ $("#nuevo").click(function(event)
             },
             error:function(data)
             {
-                
-                $("#error").html(data.responseJSON.name);
-                $("#message-error").fadeIn();
                 if (data.status == 422) {
-                   console.clear();
+                   var errors = $.parseJSON(data.responseText);
+                    $.each(errors, function (key, val) {
+                        displayFieldError('#createServiceform '+ '#'+key, val);
+                    });
+                }else{
+                    notifySuccess("HA OCURRIDO UN ERROR, POR FAVOR INTENTE DE NUEVO");
                 }
                 $.unblockUI();
-                notifySuccess("HA OCURRIDO UN ERROR, POR FAVOR INTENTE DE NUEVO");
+                
 
             }  
           })
@@ -147,21 +173,28 @@ $("#nuevo").click(function(event)
     function clearAddForm(){
         $('#createServiceform #name').val('');
         $('#createServiceform #description').val('');
-        $('#createServiceform #pricePer').val('');
+        $('#createServiceform #price').val('');
         $('#createServiceform #fullAddress').val('');
         $('#createServiceform #contactNumber').val('');
         $('#createServiceform #contactEmail').val('');
-        
     }
+    
+    function createChangeProvince() {
+        var route = "../districsByProvince/" + $("#createServiceform #province").val();
+          $("#createServiceform #district").empty();
+          
+          $.get(route, function(res) {
+            if (res.length!=0) {
+               $(res).each(function(key, value) {
+                   $('#createServiceform #district').append($('<option>', {value:value.id, text:value.name}));
+              });
+            }
+          });
+        }
 //-------- CREAR UN SERVICIO --------//
 
 
 //-------- ACTUALIZAR UN SERVICIO --------//  
-
-
-
-//-------- ACTUALIZAR UN SERVICIO --------//  
-
 var Mostrar = function(id)
 {
     blockPage();
@@ -171,111 +204,88 @@ var Mostrar = function(id)
     $("#editServiceform #name").val(data.name);
     $("#editServiceform #description").val(data.description);
     $("#editServiceform #price").val(data.price);
-    loadSelect("../categories", "#editServiceform #category" );
-    loadSelect("../pricePer", "#editServiceform #pricePer" );
-    loadSelect("../provinces", "#editServiceform #province" );
-    loadSelect("../districts", "#editServiceform #district" );
+    $("#editServiceform #fulladdress").val(data.fullAddress);
+    $("#editServiceform #contactEmail").val(data.contactEmail);
+    $("#editServiceform #contactNumber").val(data.contactNumber);
+    loadSelectDefault("../categories", "#editServiceform #category",data.category_id); 
+    loadSelectDefault("../pricePer", "#editServiceform #pricePer", data.pricePer_id );
+    loadSelectDefault("../provinces","#editServiceform #province", data.province_id);
+    loadSelectDefault("../districsByProvince/"+data.province_id, "#editServiceform #district",data.district_id );
     $.unblockUI();
     $("#serviceEditModal").modal('show');
   });
-  
 }
-
-
-//---------------------
-
-
-function loadcategories() {
-    var route = "../categories";
-      $("#editServiceform #category").empty();
-      $.get(route, function(res) {
-        if (res.length!=0) {
-           $(res).each(function(key, value) {
-               $('#editServiceform #category').append($('<option>', {value:value.id, text:value.name}));
-          });
-        }
-      });
-    }
-function loadProvinces() {
-    var route = "../provinces";
-      $("#editServiceform #province").empty();
-      $.get(route, function(res) {
-        if (res.length!=0) {
-           $(res).each(function(key, value) {
-               $('#editServiceform #province').append($('<option>', {value:value.id, text:value.name}));
-          });
-        }
-      });
-    }
-    
-function loadPricePer() {
-    var route = "../pricePer";
-      $("#editServiceform #pricePer").empty();
-      $.get(route, function(res) {
-        if (res.length!=0) {
-           $(res).each(function(key, value) {
-               $('#editServiceform #pricePer').append($('<option>', {value:value.id, text:value.name}));
-          });
-        }
-      });
-    }
-
-function changeProvince() {
-    var route = "../districsByProvince/" + $("#createServiceform #province").val();
-      $("#createServiceform #district").empty();
-      
-      $.get(route, function(res) {
-        if (res.length!=0) {
-           $(res).each(function(key, value) {
-               $('#createServiceform #district').append($('<option>', {value:value.id, text:value.name}));
-          });
-        }
-      });
-    }
 
 $("#actualizar").click(function()
 {
     blockPage();
-  var id = $("#id").val();
-  var name = $("#name").val();
-  var route = "{{url('mark')}}/"+id+"";
-  var token = $("#token").val();
+    var id = $("#editServiceform #id").val();
+    var name = $("#editServiceform #name").val();
+    var category = $("#editServiceform #category").val();
+    var description = $("#editServiceform #description").val();
+    var price = $("#editServiceform #price").val();
+    var pricePer = $("#editServiceform #pricePer").val();
+    var province = $("#editServiceform #province").val();
+    var district = $("#editServiceform #district").val();
+    var fullAddress = $("#editServiceform #fulladdress").val();
+    var contactNumber = $("#editServiceform #contactNumber").val();
+    var contactEmail = $("#editServiceform #contactEmail").val();
+    var route = "{{url('services')}}/"+id+"";
+    var token = $("#token").val();
 
   $.ajax({
     url: route,
     headers: {'X-CSRF-TOKEN': token},
     type: 'PUT',
     dataType: 'json',
-    data: {name: name},
+    data: {id:id, name: name, category: category, description:description, price:price,  pricePer:pricePer,
+                province:province, district: district, fullAddress:fullAddress, contactNumber:contactNumber,
+                contactEmail:contactEmail
+            },
     success: function(data){
      
      if (data.success == 'true')
      {
-        listmark();
-        $("#myModal").modal('toggle');
-        $("#message-update").fadeIn();
+        listservice();
+        $("#serviceEditModal").modal('toggle');
         $.unblockUI();
+        notifySuccess("SERVICIO ACTUALIZADO CORRECTAMENTE");
        }
     },
     error:function(data)
     {
-        $("#error").html(data.responseJSON.name);
-        $("#message-error").fadeIn();
         if (data.status == 422) {
-           console.clear();
+           var errors = $.parseJSON(data.responseText);
+            $.each(errors, function (key, val) {
+                displayFieldError('#editServiceform '+ '#'+key, val);
+                
+            });
+        }else{
+            notifySuccess("HA OCURRIDO UN ERROR, POR FAVOR INTENTE DE NUEVO");
         }
-
+        $.unblockUI();
+        
     }  
   });
 });
 
-//CUANDO CIERRAS LA VENTANA MODAL
-$("#serviceEditModal").on("hidden.bs.modal", function () {
-    $("#message-error").fadeOut()
-});
+function editChangeProvince() {
+        var route = "../districsByProvince/" + $("#editServiceform #province").val();
+          $("#editServiceform #district").empty();
+          
+          $.get(route, function(res) {
+            if (res.length!=0) {
+               $(res).each(function(key, value) {
+                   $('#editServiceform #district').append($('<option>', {value:value.id, text:value.name}));
+              });
+            }
+          });
+}
 
-//BOTON ELIMINAR
 
+//-------- ACTUALIZAR UN SERVICIO --------//  
+
+//-------- ELIMINAR UN SERVICIO --------//  
 var Eliminar = function(id,name)
 { 
      // ALERT JQUERY
@@ -302,6 +312,22 @@ var Eliminar = function(id,name)
     });
 
 };
+//-------- ELIMINAR UN SERVICIO --------// 
+
+
+
+
+
+
+
+//CUANDO CIERRAS LA VENTANA MODAL
+$("#serviceEditModal").on("hidden.bs.modal", function () {
+    $("#message-error").fadeOut()
+});
+
+//BOTON ELIMINAR
+
+
 
 </script>
   

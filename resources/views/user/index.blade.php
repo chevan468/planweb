@@ -4,8 +4,8 @@
 
 @section('content')
 <br>
-    <div class="row">
-        <div class="col-md-5 col-md-offset-3">
+    <div class="container">
+        <div class="col-md-8 col-md-offset-2">
             @include('partials.messages')
 
           <div id="message-update" class="alert alert-success" role="alert" style="display:none">
@@ -74,35 +74,43 @@ var Mostrar = function(id)
   blockPage();
   var route = "{{url('user')}}/"+id+"/edit";
   $.get(route, function(data){
+    loadgender(data.gender_id);
     $("#id").val(data.id);
-    $("#name_Modal").val($("#name").val());
-    $("#lastName_Modal").val($("#lastName").val());
-    $("#study_Modal").val($("#study").val());
-    loadgender();
+    $("#userEditForm #name").val(data.name);
+    $("#userEditForm #lastName").val(data.lastName);
+    $("#userEditForm #study").val(data.study);
+    $("#userEditForm #interestArea").val(data.interestArea);
+    
   });
   $.unblockUI();
 }
 
-function loadgender() {
+function loadgender(preselect) {
     var route = "../genders";
       $("#userEditForm #gender_id").empty();
       $.get(route, function(res) {
         if (res.length!=0) {
            $(res).each(function(key, value) {
-               $('#userEditForm #gender_id').append($('<option>', {value:value.id, text:value.name}));
+               if(value.id == preselect){
+                   $('#userEditForm #gender_id').append($('<option>', {value:value.id, text:value.name}).attr("selected","selected") );
+               }else{
+                   $('#userEditForm #gender_id').append($('<option>', {value:value.id, text:value.name}));
+               }
           });
         }
       });
     }
 
-$("#actualizar").click(function()
+$("#actualizarUser").click(function()
 {
-  $("#userEditModal").modal('toggle');
+  
   blockPage();
   var id = $("#id").val();
-  var name = $("#name_Modal").val();
-  var lastName = $("#lastName_Modal").val()
-  var study = $("#study_Modal").val();
+  var name = $("#userEditForm #name").val();
+  var lastName = $("#userEditForm #lastName").val()
+  var study = $("#userEditForm #study").val();
+  var gender_id = $("#userEditForm #gender_id").val();
+  var interestArea = $("#userEditForm #interestArea").val();
   var route = "{{url('user')}}/"+id+"";
   var token = $("#token").val();
 
@@ -111,11 +119,12 @@ $("#actualizar").click(function()
     headers: {'X-CSRF-TOKEN': token},
     type: 'PUT',
     dataType: 'json',
-    data: {name: name, lastName: lastName, study:study},
+    data: {name: name, lastName: lastName, study:study, gender_id:gender_id, interestArea:interestArea, },
     success: function(data){
      
      if (data.success == 'true')
      {
+        $("#userEditModal").modal('toggle');
         listuser();
         $.unblockUI();
 
@@ -124,30 +133,26 @@ $("#actualizar").click(function()
     },
     error:function(data)
     {
-        $("#error").html(data.responseJSON.name);
-        $("#message-error").fadeIn();
         if (data.status == 422) {
-           console.clear();
+           var errors = $.parseJSON(data.responseText);
+            $.each(errors, function (key, val) {
+                displayFieldError('#userEditForm '+ '#'+key, val);
+            });
+        }else{
+            $("#userEditModal").modal('toggle');
+            notifySuccess("HA OCURRIDO UN ERROR, POR FAVOR INTENTE DE NUEVO");
         }
-
+        $.unblockUI();
     }  
   });
 });
 
-//CUANDO CIERRAS LA VENTANA MODAL
-$("#userEditModal").on("hidden.bs.modal", function () {
-    $("#message-error").fadeOut()
-});
-
-//BOTON ELIMINAR
-
 var Eliminar = function(id,name)
 { 
-
      // ALERT JQUERY
-    $.alertable.confirm("<span style='color:#000'>¿Está seguro de eliminar el registro?</span>"+"<strong><span style='color:#ff0000'>"+name+"</span></strong>").then(function() {
+    $.alertable.confirm("<span style='color:#000'>¿Está seguro de eliminar su perfil?\n</span>"+"<strong><span style='color:#ff0000'> Este es un proceso irreversible</span></strong>").then(function() {
   
-      var route = "{{url('mark')}}/"+id+"";
+      var route = "../user/"+id+"";
       var token = $("#token").val();
 
       $.ajax({
@@ -158,10 +163,8 @@ var Eliminar = function(id,name)
         success: function(data){
         if (data.success == 'true')
         {
-          listmark();
-          $("#message-delete").fadeIn();
-         // $('#message-delete').toggle(3000);
-          $('#message-delete').show().delay(3000).fadeOut(1);
+          notifySuccess('ELIMINADO CON EXITO');
+          window.location.href = "home";
         }
       }
       });
@@ -170,11 +173,6 @@ var Eliminar = function(id,name)
     });
 
 };
-
-
-
-
-
 
 </script>
   

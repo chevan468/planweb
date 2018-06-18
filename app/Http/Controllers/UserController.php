@@ -5,8 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 
 use App\Http\Requests;
-use App\Http\Requests\MarkCreateRequest;
-use App\Http\Requests\MarkUpdateRequest;
+use App\Http\Requests\UserUpdateRequest;
 use App\Product;
 use App\Gender;
 use App\User;
@@ -87,14 +86,13 @@ class UserController extends Controller
 
     public function edit($id)
     {
-
         $user = User::find($id);
         return response()->json($user);
 
     }
 
 
-    public function update(Request $request, $id)
+    public function update(UserUpdateRequest $request, $id)
     {
        
         if ($request->ajax())
@@ -104,6 +102,9 @@ class UserController extends Controller
             $user->name=$request['name'];
             $user->lastName=$request['lastName'];
             $user->study=$request['study'];
+            $user->gender_id=$request['gender_id'];
+            $user->interestArea=$request['interestArea'];
+            $user->description=$request['description'];
             $user->save();
             $input = $request->all();
             $result = $mark->fill($input)->save();
@@ -116,8 +117,6 @@ class UserController extends Controller
               return response()->json(['success'=>'false']);  
             }
         }   
- 
-        
     }
 
 
@@ -125,8 +124,8 @@ class UserController extends Controller
     {
 
 
-        $mark = Mark::FindOrFail($id);
-        $result = $mark->delete();
+        $user = User::FindOrFail($id);
+        $result = $user->delete();
 
         if ($result)
         {

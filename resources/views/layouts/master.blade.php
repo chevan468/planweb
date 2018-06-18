@@ -37,7 +37,7 @@
      <div class="header">
 		   <div class="col-sm-8 header-left">
 					 <div class="logo">
-						<a href="index.html"><img src="../assets/images/logo3.png" alt=""/></a>
+						<a href="/"><img src="../assets/images/logo3.png" alt=""/></a>
 					 </div>
 					 <div class="menu">
 						  <a class="toggleMenu" href="#"><img src="../assets/images/nav.png" alt="Planweb" /></a>
@@ -91,59 +91,45 @@
    </div>
 
 
+ <div id="page-wrapper">
+         
+         <div id="div-forcontent">
+            @yield('content')
+            <div id="div-forlist"></div>
+         </div>
+ </div>
 
-
-      @yield('content')
-
-
-    
-    
     <!-- Footer -->
     
     <div class="footer">
    	<div class="container">
    	 <div class="footer_top">
-   	   <h3>Subscribe to our newsletter</h3>
-   	   <form>
-		<span>
-			<i><img src="../assets/images/mail.png" alt=""></i>
-		    <input type="text" value="Enter your email" onfocus="this.value = '';" onblur="if (this.value == '') {this.value = 'Enter your email';}">
-		    <label class="btn1 btn2 btn-2 btn-2g"> <input name="submit" type="submit" id="submit" value="Subscribe"> </label>
-		    <div class="clearfix"> </div>
-		</span>			 	    
-	   </form>
+   	 	<h3>Plataforma de Servicios Profesionales.</h3>
+
 	  </div>
 	  <div class="footer_grids">
 	     <div class="footer-grid">
-			<h4>Ipsum Quis</h4>
+			<h4> Creadores</h4>
 			<ul class="list1">
-				<li><a href="contact.html">Contact</a></li>
-				<li><a href="#">Mirum est</a></li>
-				<li><a href="#">placerat facer</a></li>
-				<li><a href="#">claritatem</a></li>
-				<li><a href="#">sollemnes </a></li>
+				<li><a >Esteban Bogantes Hidalgo.</a></li>
+				<li><a >Juan Diego Sibaja Navarro.</a></li>
+				<li><a >Mario Alvarado Angulo.</a></li>
+				<li><a >Royers Murillo Castro.</a></li>
 			</ul>
 		  </div>
 		  <div class="footer-grid">
-			<h4>Quis Ipsum</h4>
-			<ul class="list1">
-				<li><a href="#">placerat facer</a></li>
-				<li><a href="#">claritatem</a></li>
-				<li><a href="#">sollemnes </a></li>
-				<li><a href="#">Claritas</a></li>
-				<li><a href="#">Mirum est</a></li>
-			</ul>
-		  </div>
-		  <div class="footer-grid last_grid">
-			<h4>Follow Us</h4>
+			<h4>Siguenos en </h4>
 			<ul class="footer_social wow fadeInLeft" data-wow-delay="0.4s">
 			  <li><a href=""> <i class="fb"> </i> </a></li>
 			  <li><a href=""><i class="tw"> </i> </a></li>
 			  <li><a href=""><i class="google"> </i> </a></li>
 			  <li><a href=""><i class="u_tube"> </i> </a></li>
 		 	</ul>
+		  </div>
+		  <div class="footer-grid last_grid">
+			<h4>Derechos </h4>
 		 	<div class="copy wow fadeInRight" data-wow-delay="0.4s">
-              <p>© 2014 Duhoot. Template by  <a href="http://w3layouts.com/" target="_blank">W3layouts</a> </p>
+              <p>© 2018 PlanWeb. Plantilla <a href="http://w3layouts.com/" target="_blank">W3layouts</a> </p>
 	        </div>
 		  </div>
 		  <div class="clearfix"> </div>

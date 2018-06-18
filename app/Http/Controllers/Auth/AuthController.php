@@ -49,9 +49,21 @@ class AuthController extends Controller
     protected function validator(array $data)
     {
         return Validator::make($data, [
-            'name' => 'required|max:255',
-            'email' => 'required|email|max:255|unique:users',
+            'name' => 'required|max:20|min:3',
+            'email' => 'required|email|max:30|unique:users',
             'password' => 'required|min:6|confirmed',
+        ],[
+            'name.required' => 'Debe ingresar un nombre',
+            'name.max' => 'El nombre no debe contener más de 20 caractéres.',
+            'name.min' => 'El nombre no debe contener menos de 3 caractéres.',
+            
+            'email.required' => 'Debe ingresar un correo',
+            'email.unique' => 'El correo ya se encuentra registrado',
+            'name.max' => 'El correo no puede contener más de 30 caractéres.',
+            
+            'password.required' => 'Debe ingresar una contraseña',
+            'password.min' => 'La contraseña debe poseer mínimo 6 caractéres',
+            'password.confirmed' => 'La contraseña y su confirmación no concuerdan.',
         ]);
     }
 

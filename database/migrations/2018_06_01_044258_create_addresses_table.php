@@ -16,12 +16,6 @@ class CreateAddressesTable extends Migration
 
           $table->increments('id');
           $table->string('name',100);
-          $table->integer('user_id')->unsigned();
-
-
-          //--------------------
-          //$table->primary('id');
-          $table->foreign('user_id')->references('id')->on('users');
       });
     }
 

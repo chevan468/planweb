@@ -14,6 +14,7 @@ class Service extends Model
       
 
       protected $fillable = [
-         'id','name', 'user_id', 'category_id', 'description', 'price','pricePer_id', 'legalNumber','contactNumber','contactEmail'
+         'id','name', 'user_id', 'category_id', 'description', 'price','pricePer_id', 'legalNumber','contactNumber',
+         'contactEmail', 'province_id','district_id','fullAddress',
       ];
 }

@@ -61,9 +61,11 @@
       route::resource('/pricePer','PricePerController');
       route::resource('/provinces','ProvinceController');
       route::resource('/districts','DistrictController');
+      route::resource('/addresses','AddressController');
       route::resource('/services','ServiceController');
       route::resource('user','UserController');
       route::get('listallservice/{page?}','ServiceController@listall');
+      route::get('listhomeservice/{page?}','ServiceController@listhome');
       route::get('listallmark/{page?}','MarkController@listall');
       route::get('listalluser/{page?}','UserController@listall');
       
@@ -74,7 +76,9 @@
 
       route::get('modelweb','DashboardController@modelweb');
 
-
+      route::get('userservice/{id}','ServiceController@openUserService');
 
    });
 
+
+Route::auth();

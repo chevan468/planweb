@@ -362,14 +362,21 @@ input:focus {
 a#loginButton img {
 	vertical-align: bottom;
 }
+.ndiv{
+    width:100%;
+    height: 170px;
+    padding-left: 10px;
+    padding-bottom: 15px;
+    background-image: url("../images/Abstract_Background_with_Blue_Triangles.jpg");
+}
+
 .banner{
-	background: url(../images/banner2.jpg) no-repeat center top;
+	background: url(../images/footer.jpg) no-repeat center top;
 	background-size:cover;
 	-webkit-background-size:cover;
 	-moz-background-size:cover;
 	-o-background-size:cover;
-	min-height:287px;
-	height:450px;
+	min-height:450px;
 	text-align:center;
 	padding-top:3em;
 }
@@ -1586,8 +1593,8 @@ ul.list1 li a{
 }
 .footer_top{
 	border-bottom: 1px solid #5b5953;
-	margin-bottom:4em;
-	padding-bottom:4em;
+	margin-bottom: 3em;
+	padding-bottom: 1em;
 }
 .footer-grid h4 {
 	color: #fff;
@@ -2674,5 +2681,18 @@ label.btn1.btn2.btn-2.btn-2g {
 .logo {
 	margin: 0;
 	width: 56%;
+}
+
+.panel-clickable{
+	cursor: pointer;
+}
+.noselect {
+  -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+     -khtml-user-select: none; /* Konqueror HTML */
+       -moz-user-select: none; /* Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome and Opera */
 }
 }
